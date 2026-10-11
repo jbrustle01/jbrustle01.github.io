@@ -33,6 +33,19 @@ PUBLISH ON GITHUB PAGES
 
 Official instructions: https://docs.github.com/en/pages/quickstart
 
+SEARCH DISCOVERY
+The canonical academic homepage is https://jbrustle01.github.io/.
+Its static HTML includes linked WebSite, ProfilePage and Person structured
+data identifying Johannes Brüstle (also published as Johannes Brustle),
+Sapienza affiliation and the supplied Google Scholar profile. Keep these
+facts consistent with the visible biography when updating the site.
+robots.txt permits crawling and references the four-page sitemap.xml.
+Update sitemap lastmod only when that specific page has actually changed.
+The google-site-verification meta tag belongs to the owner's Google Search
+Console property. It is a public verification tag, not a password; keep it
+in the homepage head so Google can continue checking ownership.
+Search indexing and ranking are decided by Google and are not guaranteed.
+
 UPDATING THE SITE
 Edit the relevant HTML file. Publication entries are ordinary HTML article
 elements in research/index.html. Selected papers also appear on index.html.
