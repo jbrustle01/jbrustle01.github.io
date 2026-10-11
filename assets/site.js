@@ -102,6 +102,13 @@ function packingState(position, placements = [], progress = {}) {
   const nextIndex = progress.nextIndex ?? currentIndex + 1;
   const heldIndices = [progress.heldIndices?.[0] ?? null, progress.heldIndices?.[1] ?? null];
   const holdUsed = progress.holdUsed ?? false;
+  const difficulty = progress.difficulty ?? position.difficulty ?? 'very-hard';
+  const rerollsUsed = progress.rerollsUsed ?? position.rerollsUsed ?? 0;
+  const revisions = {...(progress.revisions ?? position.revisions ?? {})};
+  const observedPieces = typeof PackingRules === 'undefined' ? [] : PackingRules.observePieces(position.sequence,
+    {currentIndex, nextIndex, heldIndices, revisions}, progress.observedPieces ?? position.observedPieces ?? []);
+  const rerollBudget = difficulty === 'very-hard' ? 0 : PackingRules.rerollBudget(difficulty);
+  const rerollsRemaining = Math.max(0, rerollBudget - rerollsUsed);
   const currentPiece = position.sequence[currentIndex];
   const heldPieces = heldIndices.map(heldIndex => heldIndex === null ? null : position.sequence[heldIndex]);
   function movesFor(piece) {
@@ -120,13 +127,16 @@ function packingState(position, placements = [], progress = {}) {
   const canHold = canHoldSlots.some(Boolean);
   const rescueSlot = holdRescueSlots.findIndex(Boolean);
   const holdCanRescue = rescueSlot !== -1;
+  const rerollCanRescue = rerollsRemaining > 0 && Boolean(currentPiece) && nextIndex + 6 < position.sequence.length
+    && (legalMoves.length > 0 || holdCanRescue || PackingPieces.variants.some(piece => movesFor(piece).length > 0));
   return {
     size: position.size, blocked: [...position.blocked], seed: position.seed, sequence: position.sequence,
+    difficulty, rerollBudget, rerollsUsed, rerollsRemaining, canReroll: rerollCanRescue, rerollCanRescue, revisions, observedPieces,
     placements: [...placements], index, currentIndex, nextIndex, heldIndices, holdUsed,
     currentPiece, heldPieces, canHoldSlots, holdRescueSlots, rescueSlot, canHold, holdCanRescue,
     queue: [currentPiece, ...position.sequence.slice(nextIndex, nextIndex + 3)].filter(Boolean),
     legalMoves, coveredTiles: placements.reduce((sum,piece) => sum + piece.cells.length, 0),
-    finished: legalMoves.length === 0 && !holdCanRescue
+    finished: legalMoves.length === 0 && !holdCanRescue && !rerollCanRescue
   };
 }
 
@@ -134,6 +144,7 @@ function placePackingPiece(state, anchor) {
   if (state.finished || !state.legalMoves.includes(anchor)) return state;
   const piece = {
     index: state.index, sourceIndex: state.currentIndex, ...state.currentPiece, anchor,
+    id: `${state.currentIndex}:${state.revisions[state.currentIndex] || 0}`, revision: state.revisions[state.currentIndex] || 0,
     cells: shapeCells(state.currentPiece.kind, state.currentPiece.orientation, anchor, state.size)
   };
   return packingState(state, [...state.placements, piece], {
@@ -152,6 +163,14 @@ function holdPackingPiece(state, slot = 0) {
     nextIndex: state.nextIndex + (empty ? 1 : 0),
     heldIndices, holdUsed: true
   });
+}
+
+function rerollPackingPieces(state) {
+  if (state.finished || !state.canReroll) return state;
+  // Skip the current piece and three visible previews, then reveal the next
+  // four draws from the same seeded stream. Discarded draws remain observed.
+  const progress=PackingRules.rerollProgress(state.sequence,state);
+  return progress?packingState(state,state.placements,progress):state;
 }
 
 // A square can be used whenever some legal placement covers it.
@@ -233,12 +252,16 @@ function initializeDomineering(widget) {
   const viewButtons=[...widget.querySelectorAll('[data-game-view]')];
   const setup=widget.querySelector('[data-game-setup]'),play=widget.querySelector('[data-game-play]'),start=widget.querySelector('[data-game-start]');
   const sizeButtons=[...widget.querySelectorAll('[data-game-size]')];
+  const difficultyButtons=[...widget.querySelectorAll('[data-game-difficulty]')];
+  const rerollButton=widget.querySelector('[data-game-reroll]'),rerollPanel=widget.querySelector('[data-reroll-panel]');
+  const rerollCount=widget.querySelector('[data-reroll-count]'),difficultyStatus=widget.querySelector('[data-difficulty-status]');
+  const optimalNote=widget.querySelector('[data-optimal-note]');
   const holdPanel=widget.querySelector('[data-hold-panel]'),holdHint=widget.querySelector('[data-hold-hint]');
   const holdButtons=[0,1].map(slot=>widget.querySelector(`[data-game-hold="${slot}"]`));
   if (!board || !status || !reset) return;
   const leaderboard=typeof PackingLeaderboard!=='undefined'?PackingLeaderboard.initialize(widget):null;
-  let position=null, state=null, solution=null, solverError=false, worker=null, gameToken=0, currentView='player', preparing=false, selectedSize=7, lastPointer=null, pointerInGame=false;
-  let actions=[],completionReported=false;
+  let position=null, state=null, solution=null, originalSolution=null, solverError=false, worker=null, gameToken=0, currentView='player', preparing=false, selectedSize=7, selectedDifficulty='medium', lastPointer=null, pointerInGame=false;
+  let actions=[],completionReported=false,solvingObserved=false;
   const sourceURL=document.currentScript?.src || new URL('assets/site.js',document.baseURI).href;
   const workerURL=new URL('packing-worker.js',sourceURL);
   workerURL.search=new URL(sourceURL).search;
@@ -287,13 +310,19 @@ function initializeDomineering(widget) {
   }
 
   function rescueMessage() {
-    return `${state.heldPieces[state.rescueSlot]?'Swap with':'Use Hold'} slot ${state.rescueSlot+1} to continue.`;
+    return state.holdCanRescue?`${state.heldPieces[state.rescueSlot]?'Swap with':'Use Hold'} slot ${state.rescueSlot+1} to continue.`
+      :'Reroll the current and next three pieces to continue.';
   }
 
   function updateSummary() {
     if(!state||preparing)return;
     if(help)help.textContent='Cover as many squares as you can.';
-    if(queues)queues.toggleAttribute('hidden',state.finished);
+    if(queues)queues.toggleAttribute('hidden',false);
+    if(rerollPanel)rerollPanel.toggleAttribute('hidden',false);
+    if(rerollButton)rerollButton.disabled=!state.canReroll||state.finished||currentView!=='player';
+    if(rerollCount)rerollCount.textContent=`${state.rerollsRemaining} of ${state.rerollBudget} left`;
+    if(difficultyStatus)difficultyStatus.textContent=state.difficulty==='very-hard'?'Very hard':state.difficulty[0].toUpperCase()+state.difficulty.slice(1);
+    if(optimalNote)optimalNote.toggleAttribute('hidden',currentView!=='optimal');
     if(results)results.toggleAttribute('hidden',!state.finished);
     if(score) {
       score.toggleAttribute('hidden',!state.finished);
@@ -309,13 +338,17 @@ function initializeDomineering(widget) {
       button.setAttribute('aria-pressed',String(selected));
       button.disabled=!state.finished||(button.dataset.gameView==='optimal'&&!solution?.exact);
     });
-    status.textContent=currentView==='optimal'&&solution?.exact?`Optimal offline solution: ${solution.optimalTiles} squares`:!state.finished&&state.legalMoves.length===0&&state.holdCanRescue?`${state.coveredTiles} squares covered · ${rescueMessage()}`:`${state.coveredTiles} squares covered`;
+    status.textContent=currentView==='optimal'&&solution?.exact?`Optimal offline solution: ${solution.optimalTiles} squares`:!state.finished&&state.legalMoves.length===0&&(state.holdCanRescue||state.rerollCanRescue)?`${state.coveredTiles} squares covered · ${rescueMessage()}`:`${state.coveredTiles} squares covered`;
   }
 
   function render() {
     if(!state||preparing)return;
     const placements=currentView==='optimal'&&solution?.exact?solution.placements:state.placements;
-    const pieceNumber=(piece,index)=>(piece.sourceIndex??piece.index??index)+1;
+    const pieceNumber=(piece,index)=>{
+      const id=piece.id??`${piece.sourceIndex??piece.index??index}:${piece.revision||0}`;
+      const observedIndex=state.observedPieces.findIndex(observed=>observed.id===id);
+      return observedIndex<0?(piece.sourceIndex??piece.index??index)+1:observedIndex+1;
+    };
     const occupied=new Map();
     placements.forEach((piece,index)=>piece.cells.forEach(cell=>occupied.set(cell,pieceNumber(piece,index))));
     const blocked=new Set(state.blocked);
@@ -329,19 +362,47 @@ function initializeDomineering(widget) {
       markup+=`<rect class="packing-cell-hit" x="${x-1}" y="${y-1}" width="32" height="32" fill="transparent" stroke-width="0" pointer-events="all"/></g>`;
     }
     markup+='<g pointer-events="none">'+placements.map(piece=>pieceDrawing(piece)).join('')+'</g><g data-domino-preview pointer-events="none"></g>';
-    markup+='<g data-solution-order pointer-events="none" aria-hidden="true">'+placements.map((piece,index)=>{const {x,y}=cellPosition(piece.anchor),number=pieceNumber(piece,index);return `<text data-piece-number="${number}" data-piece-source-index="${number-1}" x="${x+15}" y="${y+18}" text-anchor="middle" fill="#102430" font-family="var(--mono,monospace)" font-size="9" font-weight="600">${number}</text>`;}).join('')+'</g>';
+    markup+='<g data-solution-order pointer-events="none" aria-hidden="true">'+placements.map((piece,index)=>{const {x,y}=cellPosition(piece.anchor),number=pieceNumber(piece,index);return `<text data-piece-number="${number}" data-piece-source-index="${piece.sourceIndex??piece.index??index}" data-piece-id="${piece.id??`${piece.sourceIndex??piece.index??index}:${piece.revision||0}`}" x="${x+15}" y="${y+18}" text-anchor="middle" fill="#102430" font-family="var(--mono,monospace)" font-size="9" font-weight="600">${number}</text>`;}).join('')+'</g>';
     grid.innerHTML=markup;
     widget.dataset.gameView=currentView;
     renderQueue();renderHold();updateSummary();refreshPointerPreview();
-    if(state.finished&&!completionReported) {
-      completionReported=true;
-      leaderboard?.finishGame({actions,coveredTiles:state.coveredTiles,optimalTiles:solution?.optimalTiles||0});
+    if(state.finished&&!completionReported&&!solvingObserved&&!solverError) {
+      solveObservedResult();
     }
+  }
+
+  function solveObservedResult() {
+    solvingObserved=true;solution=null;
+    const token=++gameToken;
+    if(worker)worker.terminate();
+    function fail() {
+      if(token!==gameToken)return;
+      solvingObserved=false;solverError=true;solution=null;
+      if(worker)worker.terminate();worker=null;render();
+    }
+    try {
+      const activeWorker=new Worker(workerURL);worker=activeWorker;
+      activeWorker.onmessage=event=>{
+        const data=event.data;
+        if(!data||token!==gameToken||data.id!==token||!solvingObserved||completionReported)return;
+        if(data.type==='result'&&data.exact===true&&Number.isFinite(data.optimalTiles)&&Array.isArray(data.placements)) {
+          solution={optimalTiles:data.optimalTiles,placements:data.placements,exact:true};
+          solvingObserved=false;solverError=false;completionReported=true;
+          activeWorker.terminate();if(worker===activeWorker)worker=null;
+          render();
+          leaderboard?.finishGame({actions,coveredTiles:state.coveredTiles,optimalTiles:solution.optimalTiles,difficulty:state.difficulty,
+            solution:{placements:solution.placements.map(piece=>({id:piece.id,anchor:piece.anchor}))}});
+        } else if(data.type==='error')fail();
+      };
+      activeWorker.onerror=fail;
+      updateSummary();
+      activeWorker.postMessage({id:token,type:'observed',position:{size:state.size,blocked:state.blocked,pool:state.observedPieces,hint:originalSolution?.placements}});
+    } catch(error) {fail();}
   }
 
   function focusNextAction() {
     const target=state.finished?(viewButtons.find(button=>button.dataset.gameView==='player')||newGame||reset)
-      :state.legalMoves.length?board.querySelector(`[data-domino-cell="${state.legalMoves[0]}"]`):holdButtons[state.rescueSlot];
+      :state.legalMoves.length?board.querySelector(`[data-domino-cell="${state.legalMoves[0]}"]`):state.holdCanRescue?holdButtons[state.rescueSlot]:rerollButton;
     target?.focus({preventScroll:true});
   }
 
@@ -360,6 +421,14 @@ function initializeDomineering(widget) {
     const next=holdPackingPiece(state,slot);
     if(next===state)return;
     actions.push({type:'hold',slot});
+    state=next;render();
+    if(keyboard)focusNextAction();
+  }
+  function rerollPieces(keyboard) {
+    if(!state||preparing||currentView!=='player')return;
+    const next=rerollPackingPieces(state);
+    if(next===state)return;
+    actions.push({type:'reroll'});
     state=next;render();
     if(keyboard)focusNextAction();
   }
@@ -393,6 +462,9 @@ function initializeDomineering(widget) {
     if(score){score.textContent='';score.toggleAttribute('hidden',true);}
     if(results)results.toggleAttribute('hidden',true);
     if(holdPanel)holdPanel.toggleAttribute('hidden',true);
+    if(rerollPanel)rerollPanel.toggleAttribute('hidden',true);
+    if(rerollButton)rerollButton.disabled=true;
+    if(optimalNote)optimalNote.toggleAttribute('hidden',true);
     holdButtons.forEach(button=>{
       if(!button)return;
       button.disabled=true;
@@ -410,8 +482,8 @@ function initializeDomineering(widget) {
 
   function preparePuzzle(seed,size) {
     if(worker)worker.terminate();
-    worker=null;position=null;state=null;solution=null;solverError=false;preparing=true;currentView='player';lastPointer=null;
-    actions=[];completionReported=false;
+    worker=null;position=null;state=null;solution=null;originalSolution=null;solverError=false;preparing=true;currentView='player';lastPointer=null;
+    actions=[];completionReported=false;solvingObserved=false;
     const extent=size*32+16;
     board.setAttribute('viewBox',`${(400-size*32)/2-8} 0 ${extent} ${extent}`);
     widget.dataset.size=String(size);
@@ -432,8 +504,9 @@ function initializeDomineering(widget) {
         if(data.type==='generated'&&data.solution?.exact===true&&Number.isFinite(data.solution.optimalTiles)
           &&Array.isArray(data.solution.placements)&&data.position?.seed===seed&&data.position.size===size
           &&Array.isArray(data.position.sequence)&&Array.isArray(data.position.blocked)) {
-          position=data.position;
-          solution={optimalTiles:data.solution.optimalTiles,placements:data.solution.placements,exact:true};
+          position={...data.position,difficulty:selectedDifficulty};
+          originalSolution=data.solution;
+          solution=null;
           state=packingState(position);preparing=false;solverError=false;currentView='player';
           reset.disabled=false;board.setAttribute('aria-busy','false');widget.dataset.preparing='false';
           render();
@@ -469,25 +542,29 @@ function initializeDomineering(widget) {
   widget.addEventListener('pointerenter',()=>{pointerInGame=true;});
   widget.addEventListener('pointerleave',()=>{pointerInGame=false;});
   holdButtons.forEach((button,slot)=>button?.addEventListener('click',event=>holdPiece(slot,event.detail===0)));
+  if(rerollButton)rerollButton.addEventListener('click',event=>rerollPieces(event.detail===0));
   document.addEventListener('keydown',event=>{
     if(event.defaultPrevented||event.repeat||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;
-    const slot=['h','j'].indexOf(event.key?.toLowerCase());
-    if(slot===-1||!state||preparing||state.finished||!state.canHoldSlots[slot]||currentView!=='player')return;
+    const key=event.key?.toLowerCase(),slot=['h','j'].indexOf(key),reroll=key==='r';
+    if((slot===-1&&!reroll)||!state||preparing||state.finished||currentView!=='player')return;
+    if(reroll?!state.canReroll:!state.canHoldSlots[slot])return;
     const target=event.target;
     if(target?.isContentEditable||target?.closest?.('input, textarea, select, [contenteditable], [role="textbox"]'))return;
     const focusedInGame=widget.contains(document.activeElement)||widget.contains(target);
     if(!pointerInGame&&!focusedInGame)return;
-    event.preventDefault();holdPiece(slot,focusedInGame);
+    event.preventDefault();if(reroll)rerollPieces(focusedInGame);else holdPiece(slot,focusedInGame);
   });
 
   function updateSizeChoice() {
     sizeButtons.forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.gameSize)===selectedSize)));
+    difficultyButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.gameDifficulty===selectedDifficulty)));
     widget.dataset.selectedSize=String(selectedSize);
+    widget.dataset.difficulty=selectedDifficulty;
   }
   function showSetup(focusChoice=false) {
     if(worker)worker.terminate();worker=null;gameToken++;
     position=null;state=null;solution=null;preparing=false;currentView='player';lastPointer=null;
-    actions=[];completionReported=false;leaderboard?.cancelGame(selectedSize);
+    actions=[];completionReported=false;solvingObserved=false;leaderboard?.cancelGame(selectedSize,selectedDifficulty);
     showPreparation('',false);
     if(setup)setup.toggleAttribute('hidden',false);
     if(play)play.toggleAttribute('hidden',true);
@@ -508,19 +585,24 @@ function initializeDomineering(widget) {
       actions=[];completionReported=false;
       const token=++gameToken;
       showPreparation();
-      leaderboard.startGame(size).then(ticket=>{if(token===gameToken)begin(ticket);});
+      leaderboard.startGame(size,selectedDifficulty).then(ticket=>{if(token===gameToken)begin(ticket);});
     } else begin(null);
     const reducedMotion=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
     widget.scrollIntoView?.({block:'start',behavior:reducedMotion?'auto':'smooth'});
   }
   sizeButtons.forEach(button=>button.addEventListener('click',()=>{
     const size=Number(button.dataset.gameSize);
-    if([5,7,9,11].includes(size)){selectedSize=size;updateSizeChoice();leaderboard?.setSize(size);}
+    if([5,7,9,11].includes(size)){selectedSize=size;updateSizeChoice();leaderboard?.setCategory(size,selectedDifficulty);}
+  }));
+  difficultyButtons.forEach(button=>button.addEventListener('click',()=>{
+    const difficulty=button.dataset.gameDifficulty;
+    if(['easy','medium','hard','very-hard'].includes(difficulty)){selectedDifficulty=difficulty;updateSizeChoice();leaderboard?.setCategory(selectedSize,difficulty);}
   }));
   if(start)start.addEventListener('click',startSelectedGame);
   reset.addEventListener('click',()=>{
     if(!position||preparing)return;
-    actions=[];completionReported=false;leaderboard?.resetGame();
+    if(worker)worker.terminate();worker=null;gameToken++;
+    actions=[];completionReported=false;solvingObserved=false;solverError=false;solution=null;leaderboard?.resetGame();
     state=packingState(position);currentView='player';lastPointer=null;render();
   });
   if(newGame)newGame.addEventListener('click',()=>showSetup(true));

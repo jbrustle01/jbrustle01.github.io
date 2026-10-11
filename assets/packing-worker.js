@@ -1,5 +1,5 @@
 'use strict';
-importScripts('./packing-pieces.js?v=board11-18', './packing-solver.js?v=board11-18');
+importScripts('./packing-pieces.js?v=reroll-19', './packing-solver.js?v=reroll-19');
 self.onmessage = function (event) {
   const {id, position, seed, size, type} = event.data || {};
   try {
@@ -7,6 +7,9 @@ self.onmessage = function (event) {
     if(type==='generate') {
       const generated=PackingSolver.generate(seed,options);
       self.postMessage({id,type:'generated',...generated});
+    } else if(type==='observed') {
+      const result=PackingSolver.solveObserved(position,options);
+      self.postMessage({id,type:'result',...result});
     } else {
       const result=PackingSolver.solve(position,options);
       self.postMessage({id,type:'result',...result});
