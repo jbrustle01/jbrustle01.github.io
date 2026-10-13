@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Teaching | Johannes Brüstle</title>
+  <meta name="description" content="Teaching at Sapienza University of Rome and previous teaching assistantships at LSE and McGill University.">
+  <meta name="theme-color" content="#0c141f">
+  <meta property="og:title" content="Teaching | Johannes Brüstle">
+  <meta property="og:description" content="Teaching at Sapienza University of Rome and previous teaching assistantships at LSE and McGill University.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jbrustle01.github.io/teaching/">
+  <link rel="canonical" href="https://jbrustle01.github.io/teaching/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/packing-pieces.js?v=reroll-19" defer></script>
+  <script src="../assets/packing-rules.js?v=reroll-19" defer></script>
+  <script src="../assets/player-names.js?v=reroll-19" defer></script>
+  <script src="../assets/leaderboard.js?v=reroll-19" defer></script>
+  <script src="../assets/site.js?v=reroll-19" defer></script>
+  <style id="packing-game-style">
+    .game-section{padding:52px 0 60px}
+    .no-js .game-section{display:none}
+    .domineering-field{width:min(100%,780px);margin:0 auto}
+    .game-setup{padding:26px;border:1px solid #304454;border-radius:5px;background:linear-gradient(135deg,#14253588,#0d182680)}
+    .game-setup-label{display:block;margin:0 0 17px;font-family:var(--mono,monospace);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#a8c2d2}
+    .game-sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .game-sizes button{min-height:85px;padding:18px 8px;border:1px solid #3c5669;border-radius:3px;background:#0e1c2b;color:#a8c2d2;font-family:var(--display);font-size:24px;letter-spacing:-.04em;cursor:pointer}
+    .game-sizes button[aria-pressed="true"]{color:#e1f5fc;background:#1a3548;border-color:#8ac5d8;box-shadow:inset 0 0 20px #6cadcc0a}
+    .game-sizes button:hover,.game-sizes button:focus-visible{border-color:#b0d9e8;color:#e2f5fc}
+    .difficulty-label{margin-top:24px}.game-difficulties{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.game-difficulties button{padding:13px 6px;border:1px solid #3c5669;border-radius:3px;background:#0e1c2b;color:#a8c2d2;font:12px var(--mono,monospace);cursor:pointer}.game-difficulties button span{display:block;margin-top:7px;font-size:10px;color:#8da7b6}.game-difficulties button[aria-pressed="true"]{background:#1a3548;border-color:#8ac5d8;color:#e1f5fc}.game-difficulties button:focus-visible,.game-difficulties button:hover{border-color:#b0d9e8}
+    .reroll-panel{font-family:var(--mono,monospace);width:100%}.reroll-summary{display:flex;justify-content:space-between;gap:7px;color:#9bb5c5;font-size:10px;line-height:1.5;margin-bottom:8px}.game-reroll{width:100%;display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #668fa4;border-radius:3px;background:#142b3c;color:#c2e3ee;font:11px var(--mono,monospace);cursor:pointer}.game-reroll:hover:not(:disabled),.game-reroll:focus-visible{border-color:#c4e7f2;background:#1a3548}.game-reroll:disabled{opacity:.45;cursor:default}.game-reroll kbd{font:10px var(--mono,monospace);border:1px solid #54788d;border-radius:3px;padding:1px 5px}.reroll-hint{font-size:10px;line-height:1.6;color:#8da7b6;margin:8px 0 0}
+    .game-start{display:block;margin:22px 0 0 auto;padding:10px 22px;border:1px solid #8ac5d8;border-radius:3px;background:#1a3548;color:#e1f5fc;font-family:var(--mono,monospace);font-size:12px;cursor:pointer}
+    .game-start:hover,.game-start:focus-visible{background:#24465b;border-color:#d0ebf5}
+    .game-layout{display:grid;grid-template-columns:minmax(0,1fr) 142px;gap:24px;align-items:center}
+    .game-sidebar{display:flex;flex-direction:column;gap:20px;justify-content:center;min-width:0}
+    .game-score{font-family:var(--mono,monospace);color:#a8c2d2;font-size:11px;line-height:1.7}
+    .game-score strong{display:block;font-family:var(--display);font-size:40px;font-weight:400;line-height:1.2;color:#d9eff7;letter-spacing:-.04em;margin-bottom:7px}
+    .game-score span{display:block}
+    .game-results{display:grid;gap:8px}
+    .game-results button{font-family:var(--mono,monospace);font-size:11px;color:#9bb5c5;background:transparent;border:1px solid #3c5669;border-radius:3px;padding:8px 6px;cursor:pointer;line-height:1.4}
+    .game-results button[aria-pressed="true"]{color:#dcf0f7;background:#1a3548;border-color:#8ac5d8}
+    .game-results button:disabled{opacity:.45;cursor:default}
+    .game-results button:hover:not(:disabled),.game-results button:focus-visible{border-color:#a4cbdc;color:#e2f5fc}
+    .piece-queues{font-family:var(--mono,monospace);color:#95c5d7}
+    .piece-label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+    .piece-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .piece-slot{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:10px}
+    .piece-preview{display:block;width:100%;height:66px;padding:7px;border:1px solid #2b3b4b;border-radius:3px;background:#10213080}
+    .piece-slot.is-current .piece-preview{border-color:currentColor;background:#18304480}
+    .piece-slot svg{display:block;width:100%;height:100%;overflow:visible}
+    .hold-panel{border-top:1px solid #304454;padding-top:16px;font-family:var(--mono,monospace)}
+    .hold-slots{display:grid;gap:8px}
+    .game-hold{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px;border:1px solid #668fa4;border-radius:3px;background:#142b3c;color:#c2e3ee;cursor:pointer;text-align:center}
+    .game-hold:hover:not(:disabled),.game-hold:focus-visible{border-color:#c4e7f2;background:#1a3548;color:#e2f5fc}
+    .game-hold:disabled{opacity:.45;cursor:default}
+    .hold-preview{display:flex;align-items:center;justify-content:center;width:46px;height:46px;flex-shrink:0;font-size:24px;color:#88b7c9}
+    .hold-preview svg{display:block;width:100%;height:100%;overflow:visible}
+    .hold-label{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;line-height:1.3}
+    .game-hold kbd{font:10px var(--mono,monospace);border:1px solid #54788d;border-radius:3px;padding:1px 5px;color:#a8c2d2}
+    .hold-hint{margin:9px 0 0;color:#8da7b6;font-size:10px;line-height:1.6}
+    .domineering-board{display:block;width:100%;height:auto;overflow:visible}
+    .domineering-board [data-domino-cell]{cursor:pointer;outline:none}
+    .domineering-board [data-domino-cell][aria-disabled="true"]{cursor:default}
+    .domineering-board [data-domino-cell]:focus-visible rect:not(.packing-cell-hit){stroke:#e2f5fc;stroke-width:1.5}
+    .game-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin:16px auto 0;font-family:var(--mono,monospace);font-size:11px;letter-spacing:.02em;color:#a8c2d2}
+    .game-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+    .game-controls button{font:inherit;letter-spacing:inherit;color:#a8c2d2;background:transparent;border:1px solid #3c5669;border-radius:3px;padding:6px 10px;cursor:pointer;line-height:1.3}
+    .game-controls button:hover,.game-controls button:focus-visible{color:#e2f5fc;border-color:#a4cbdc}
+    .game-help{font-family:var(--display);font-size:22px;letter-spacing:-.02em;text-align:left;color:#c9dde7;margin:0 0 28px;line-height:1.4}
+    @media(max-width:600px){.game-section{padding:36px 0 42px}.game-setup{padding:20px}.game-sizes{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.game-difficulties{grid-template-columns:repeat(2,minmax(0,1fr))}.reroll-panel{max-width:430px}.game-sizes button{min-height:66px;padding:12px 4px;font-size:22px}.game-layout{display:flex;flex-direction:column;gap:22px}.domineering-board{max-width:430px}.game-sidebar{width:100%;flex-direction:row;align-items:center;gap:20px}.piece-queues{width:100%;max-width:430px}.piece-slots{grid-template-columns:repeat(4,minmax(0,1fr))}.game-score{width:130px}.game-results{width:142px}.game-score strong{font-size:34px}.game-help{font-size:20px;margin-bottom:20px}.game-controls{font-size:10px;margin-top:24px}.game-controls button{padding:7px 9px}}
+    @media(max-width:600px){.game-sidebar{flex-wrap:wrap;gap:16px;justify-content:center}.hold-panel{width:100%;max-width:430px;border-top:0;padding-top:0}.hold-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.game-hold{padding:6px 10px;gap:6px}.hold-preview{width:40px;height:40px}.hold-label{flex-direction:row;gap:6px}.hold-hint{margin:8px 0 0;text-align:center}}
+    .leaderboard-panel{margin-top:34px;padding-top:25px;border-top:1px solid #304454;font-family:var(--mono,monospace)}
+    .leaderboard-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .leaderboard-heading h2{margin:0;color:#c9dde7;font-family:var(--display);font-size:22px;font-weight:400;letter-spacing:-.02em}
+    .leaderboard-sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.leaderboard-sizes button,.leaderboard-submit button{font:11px var(--mono,monospace);border:1px solid #3c5669;border-radius:3px;padding:8px 12px;color:#a8c2d2;background:transparent;cursor:pointer}
+    .leaderboard-sizes button[aria-pressed="true"],.leaderboard-submit button{color:#e1f5fc;background:#1a3548;border-color:#8ac5d8}
+    .leaderboard-sizes button:hover,.leaderboard-sizes button:focus-visible,.leaderboard-submit button:hover,.leaderboard-submit button:focus-visible{border-color:#d0ebf5;color:#e2f5fc}
+    .leaderboard-difficulties{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}.leaderboard-difficulties button{padding:7px 11px;color:#a8c2d2;background:transparent;border:1px solid #3c5669;border-radius:3px;font:11px var(--mono,monospace);cursor:pointer}.leaderboard-difficulties button[aria-pressed="true"]{color:#e1f5fc;background:#1a3548;border-color:#8ac5d8}.leaderboard-difficulties button:hover,.leaderboard-difficulties button:focus-visible{border-color:#d0ebf5}
+    .leaderboard-note{color:#8da7b6;font-size:10px;line-height:1.7;margin:10px 0 0}.leaderboard-status,.leaderboard-submit-status{color:#a8c2d2;font-size:11px;line-height:1.7;margin:18px 0 0}.leaderboard-submit-status:empty{display:none}
+    .leaderboard-list{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}.leaderboard-list:empty{display:none}
+    .leaderboard-entry{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #243847;font-size:12px}.leaderboard-rank{color:#7f9dab}.leaderboard-name{color:#c9dde7;overflow-wrap:anywhere}.leaderboard-score{color:#b5dfed}
+    .leaderboard-submit{margin-top:22px;padding:18px;border:1px solid #3c5669;border-radius:3px;background:#12253680}.leaderboard-submit label{display:block;margin-bottom:10px;font-size:11px;color:#c9dde7}.leaderboard-submit label span{color:#8da7b6}.leaderboard-submit-controls{display:flex;gap:10px}.leaderboard-submit input{min-width:0;flex:1;padding:10px;border:1px solid #54788d;border-radius:3px;background:#0e1c2b;color:#c9dde7;font:12px var(--mono,monospace)}.leaderboard-submit input[aria-invalid="true"]{border-color:#d7978d}.leaderboard-submit input:focus-visible{outline:2px solid #8ac5d8;outline-offset:2px}.leaderboard-submit button:disabled{opacity:.5;cursor:default}
+    @media(max-width:600px){.leaderboard-heading{gap:10px}.leaderboard-heading h2{font-size:20px}.leaderboard-sizes{grid-template-columns:repeat(2,minmax(0,1fr))}.leaderboard-sizes button{padding:8px 9px}.leaderboard-list{grid-template-columns:1fr}.leaderboard-submit{padding:14px}.leaderboard-submit-controls{gap:8px}.leaderboard-submit button{padding:8px 10px}}
+    @media print{.game-section{display:none}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header wrap">
+    <a class="brand" href="../" aria-label="Johannes Brüstle — home"><span class="monogram" aria-hidden="true">JB</span><span>Johannes Brüstle</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="../">About</a><a href="../research/">Research</a><a href="../teaching/" aria-current="page">Teaching</a><a href="../cv/">CV</a></nav>
+  </header>
+  <main id="main" class="wrap">
+<header class="page-head"><p class="eyebrow">Teaching</p><h1>Teaching &amp; courses.</h1><p class="lede">Courses at Sapienza University of Rome, and previous teaching assistantships at the London School of Economics and McGill University.</p></header>
+<section class="course" aria-labelledby="course-title"><div class="course-meta"><strong>2025 / 2026 · Second semester</strong>Sapienza University of Rome</div><div><h2 id="course-title">Economics and Computation</h2><p>Co-taught with Prof. Stefano Leonardi for Master’s students in Data Science.</p><a class="text-link small" href="mailto:brustle@diag.uniroma1.it">Contact me about the course <span class="arrow" aria-hidden="true">↗</span></a></div></section>
+<section class="cv-section" aria-labelledby="ta-title"><h2 id="ta-title">Teaching<br>assistantships</h2><div class="cv-items">
+<article class="cv-entry"><p class="date">August 2022 – April 2023</p><h3>Introduction to Abstract Mathematics</h3><p>London School of Economics</p></article>
+<article class="cv-entry"><p class="date">January 2022 – April 2022</p><h3>Optimization</h3><p>London School of Economics</p></article>
+<article class="cv-entry"><p class="date">January 2021 – April 2021</p><h3>Further Quantitative Methods</h3><p>London School of Economics</p></article>
+<article class="cv-entry"><p class="date">September 2017 – April 2018</p><h3>Algorithm Design</h3><p>McGill University</p></article></div></section>
+<section class="section game-section" id="play" aria-labelledby="game-instructions">
+    <div class="domineering-field" data-domineering data-leaderboard-api="https://jbrustle-puzzle-leaderboard.jbrustle01.workers.dev" role="group" aria-label="Single-player shape game">
+      <p class="game-help" id="game-instructions" data-game-help>Cover as many squares as you can.</p>
+      <div class="game-setup" data-game-setup>
+        <p class="game-setup-label" id="game-size-label">Choose your board</p>
+        <div class="game-sizes" role="group" aria-labelledby="game-size-label">
+          <button type="button" data-game-size="5" aria-pressed="false" aria-label="5 by 5 board">5 × 5</button>
+          <button type="button" data-game-size="7" aria-pressed="true" aria-label="7 by 7 board">7 × 7</button>
+          <button type="button" data-game-size="9" aria-pressed="false" aria-label="9 by 9 board">9 × 9</button>
+          <button type="button" data-game-size="11" aria-pressed="false" aria-label="11 by 11 board">11 × 11</button>
+        </div>
+        <p class="game-setup-label difficulty-label" id="game-difficulty-label">Choose your difficulty</p>
+        <div class="game-difficulties" role="group" aria-labelledby="game-difficulty-label">
+          <button type="button" data-game-difficulty="easy" aria-pressed="false">Easy<span>3 rerolls</span></button>
+          <button type="button" data-game-difficulty="medium" aria-pressed="true">Medium<span>2 rerolls</span></button>
+          <button type="button" data-game-difficulty="hard" aria-pressed="false">Hard<span>1 reroll</span></button>
+          <button type="button" data-game-difficulty="very-hard" aria-pressed="false">Very hard<span>No rerolls</span></button>
+        </div>
+        <button type="button" class="game-start" data-game-start>Start game</button>
+      </div>
+      <div data-game-play hidden>
+      <div class="game-layout">
+      <svg xmlns="http://www.w3.org/2000/svg" id="domineering-board" data-domineering-board class="domineering-board" viewBox="80 0 240 240" fill="none" role="group" aria-labelledby="dm-title" aria-describedby="dm-desc">
+        <title id="dm-title">Single-player shape game</title>
+        <desc id="dm-desc">Cover as many squares as you can. Choose a board size and difficulty, then place your current piece on empty squares. Every piece covers four squares. You can see the next three pieces. Shapes and orientations are fixed by the starting seed. Easy gives three rerolls, Medium two, Hard one, and Very hard none. Click Reroll pieces or press R to replace the current and next three pieces; held pieces stay unchanged. Hover or focus any empty square that the piece could cover to preview a valid placement, then click or press Enter to place the preview. Keep up to two pieces on hold. Click a hold slot, or press H for slot 1 or J for slot 2, to store the current piece or swap it with that slot. You can hold or swap once per placement across both slots. Placed pieces show their draw numbers, matching the optimal offline solution. Each rerolled piece is a new numbered draw. The game ends when the current piece cannot fit and neither a permitted hold nor a remaining reroll can help. Compare your final layout with the optimal offline packing from every piece you have seen, including held pieces, previews and discarded rerolls. Your score is the percentage of the optimal number of squares that you covered. New game lets you choose a size, difficulty and fresh seed; Reset replays the same original start with both hold slots empty and all rerolls restored.</desc>
+      </svg>
+      <div class="game-sidebar">
+        <div class="piece-queues" data-piece-queues aria-label="Upcoming pieces"></div>
+        <div class="reroll-panel" data-reroll-panel hidden>
+          <div class="reroll-summary"><span data-difficulty-status>Medium</span><span data-reroll-count>2 of 2 left</span></div>
+          <button type="button" class="game-reroll" data-game-reroll aria-keyshortcuts="R" aria-describedby="game-reroll-hint" disabled><span>Reroll pieces</span><kbd>R</kbd></button>
+          <p class="reroll-hint" id="game-reroll-hint">Replaces the current and next three pieces. Held pieces stay.</p>
+        </div>
+        <div class="hold-panel" data-hold-panel hidden>
+          <div class="hold-slots">
+            <button type="button" class="game-hold" data-game-hold="0" aria-label="Hold current piece in slot 1" aria-keyshortcuts="H" aria-describedby="game-hold-hint" disabled>
+              <span class="hold-preview" data-hold-preview aria-hidden="true">+</span>
+              <span class="hold-label"><span data-hold-action>Hold 1</span><kbd>H</kbd></span>
+            </button>
+            <button type="button" class="game-hold" data-game-hold="1" aria-label="Hold current piece in slot 2" aria-keyshortcuts="J" aria-describedby="game-hold-hint" disabled>
+              <span class="hold-preview" data-hold-preview aria-hidden="true">+</span>
+              <span class="hold-label"><span data-hold-action>Hold 2</span><kbd>J</kbd></span>
+            </button>
+          </div>
+          <p class="hold-hint" id="game-hold-hint" data-hold-hint>One hold or swap per placement.</p>
+        </div>
+        <div class="game-score" data-game-score aria-live="polite" hidden></div>
+        <div class="game-results" data-game-results hidden>
+          <button type="button" data-game-view="player" aria-pressed="true">Your result</button>
+          <button type="button" data-game-view="optimal" aria-pressed="false" disabled>Optimal offline solution</button>
+          <p class="reroll-hint" data-optimal-note hidden>Best packing from all the pieces you have seen, including discarded rerolls. Numbers identify the same draws in both layouts.</p>
+        </div>
+      </div>
+      </div>
+      <div class="game-controls"><span data-game-status aria-live="polite">0 squares covered</span><span class="game-actions"><button type="button" data-game-new>New game</button><button type="button" data-game-reset>Reset</button></span></div>
+      </div>
+
+      <section class="leaderboard-panel" data-leaderboard-panel aria-labelledby="leaderboard-title">
+        <div class="leaderboard-heading"><h2 id="leaderboard-title">Leaderboard</h2><div class="leaderboard-sizes" role="group" aria-label="Leaderboard board size">
+          <button type="button" data-leaderboard-size="5" aria-pressed="false">5 × 5</button>
+          <button type="button" data-leaderboard-size="7" aria-pressed="true">7 × 7</button>
+          <button type="button" data-leaderboard-size="9" aria-pressed="false">9 × 9</button>
+          <button type="button" data-leaderboard-size="11" aria-pressed="false">11 × 11</button>
+        </div></div>
+        <div class="leaderboard-difficulties" role="group" aria-label="Leaderboard difficulty">
+          <button type="button" data-leaderboard-difficulty="easy" aria-pressed="false">Easy</button>
+          <button type="button" data-leaderboard-difficulty="medium" aria-pressed="true">Medium</button>
+          <button type="button" data-leaderboard-difficulty="hard" aria-pressed="false">Hard</button>
+          <button type="button" data-leaderboard-difficulty="very-hard" aria-pressed="false">Very hard</button>
+        </div>
+        <p class="leaderboard-note">Top 10 for each board size and difficulty. Newer scores win ties.</p>
+        <p class="leaderboard-status" data-leaderboard-status aria-live="polite">Loading leaderboard…</p>
+        <ol class="leaderboard-list" data-leaderboard-list aria-label="Top scores"></ol>
+        <div class="leaderboard-submit" data-leaderboard-submit-panel hidden>
+          <label for="leaderboard-name">Nickname <span>(optional)</span></label>
+          <div class="leaderboard-submit-controls"><input type="text" id="leaderboard-name" data-leaderboard-name aria-describedby="nickname-help" aria-invalid="false" placeholder="Anonymous" autocomplete="off" maxlength="96" list="nickname-examples"><button type="button" data-leaderboard-submit>Add my score</button></div>
+          <datalist id="nickname-examples"><option value="Johannes"></option><option value="Maple"></option><option value="Falcon"></option><option value="Aurora"></option><option value="Alex"></option><option value="Sofia"></option><option value="River"></option><option value="Robin"></option><option value="Cedar"></option><option value="Luna"></option><option value="Willow"></option><option value="Nova"></option></datalist>
+          <p class="leaderboard-note" id="nickname-help">Use a name or everyday noun, optionally followed by up to five digits (e.g. Johannes42 or Maple7). Leave blank for Anonymous.</p>
+        </div>
+        <p class="leaderboard-submit-status" data-leaderboard-submit-status aria-live="polite"></p>
+      </section>
+    </div>
+</section>
+</main>
+  <footer class="site-footer wrap">
+    <div><div class="footer-name">Johannes Brüstle</div><p class="footer-detail">Sapienza University of Rome · DIAG</p></div>
+    <div class="footer-links"><a href="mailto:brustle@diag.uniroma1.it">Email</a><a href="https://scholar.google.com/citations?user=ef6YVs4AAAAJ&amp;hl=en&amp;sortby=pubdate">Google Scholar <span aria-hidden="true">↗</span></a><a href="../assets/johannes-brustle-cv.pdf">CV <span aria-hidden="true">↓</span></a></div>
+  </footer>
+</body></html>
