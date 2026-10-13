@@ -8,7 +8,7 @@
     light: '<circle cx="12" cy="12" r="3.75"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>',
     dark: '<path d="M20.3 14.25A8.5 8.5 0 0 1 9.75 3.7a8.5 8.5 0 1 0 10.55 10.55Z"/>'
   };
-  let theme = 'dark';
+  let theme = 'light';
 
   try {
     const saved = window.localStorage.getItem(storageKey);
@@ -18,7 +18,7 @@
   }
 
   function applyTheme(nextTheme) {
-    theme = nextTheme === 'light' ? 'light' : 'dark';
+    theme = nextTheme === 'dark' ? 'dark' : 'light';
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
     const themeColor = document.querySelector('meta[name="theme-color"]');
