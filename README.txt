@@ -71,10 +71,11 @@ removing the interface does not delete or redeploy that backend.
 
 Replace assets/johannes-brustle-cv.pdf to update the downloadable CV.
 
-ADDING A PHOTO LATER
-Place the photo at assets/portrait.jpg. In index.html, an HTML comment near
-the research-interest sidebar shows where to insert the image. The portrait
-style is already defined. No empty photo placeholder is shown to visitors.
+HOMEPAGE PHOTO
+The homepage uses assets/johannes-brustle-portrait.jpg, a web-sized color
+portrait with light reflections on the black sweater retouched. It is shown
+only on index.html, beside the biography on desktop and below it on mobile.
+If replacing it, update the image dimensions in index.html as needed.
 
 TYPOGRAPHY
 The site loads Space Grotesk, IBM Plex Sans, and IBM Plex Mono from Google Fonts.

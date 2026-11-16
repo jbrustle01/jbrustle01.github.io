@@ -179,6 +179,29 @@ h1,h2{font-weight:400}h2{font-size:clamp(1.8rem,3vw,2.35rem);letter-spacing:-.04
   .page-head .lede, .compact-list li, .course p, .course-meta { color: #444; }
 }
 
+/* The homepage portrait stays beside the biography on desktop. */
+.home-portrait {
+  width: min(100%, 200px);
+  margin: 0;
+  justify-self: end;
+}
+.home-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.home-research-interests {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 760px) {
+  .home-portrait { margin: 32px auto 0; }
+}
+@media print {
+  .home-portrait { display: none; }
+}
+
 /* One title scale and starting position across every page. */
 .hero { padding-top: 0; }
 .hero-heading, .page-head { padding-top: 64px; }
