@@ -182,13 +182,14 @@ h1,h2{font-weight:400}h2{font-size:clamp(1.8rem,3vw,2.35rem);letter-spacing:-.04
 /* The homepage portrait stays beside the biography on desktop. */
 .home-content { max-width: 900px; }
 .home-content .hero {
-  grid-template-columns: minmax(0, 1fr) 240px;
+  grid-template-columns: minmax(0, 1fr) 280px;
   column-gap: 48px;
 }
 .home-portrait {
-  width: min(100%, 240px);
+  width: min(100%, 280px);
   margin: 0;
   justify-self: start;
+  align-self: center;
 }
 .home-portrait img {
   display: block;
